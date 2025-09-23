@@ -1,7 +1,7 @@
 import express from "express";
 import { getTechnologies, addTechnology, updateTechnology, deleteTechnology, getTechnology } from "../controllers/technologyController.js";
 import { upload } from "../config/cloudinary.js";
-import { verifyToken } from "../middleware/auth.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -10,8 +10,8 @@ router.get("/", getTechnologies);
 router.get("/:id", getTechnology);
 
 // Admin routes (protected)
-router.post("/", verifyToken, upload.single("icon"), addTechnology);
-router.put("/:id", verifyToken, upload.single("icon"), updateTechnology);
-router.delete("/:id", verifyToken, deleteTechnology);
+router.post("/", auth, upload.single("icon"), addTechnology);
+router.put("/:id", auth, upload.single("icon"), updateTechnology);
+router.delete("/:id", auth, deleteTechnology);
 
 export default router;
