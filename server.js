@@ -10,6 +10,7 @@ import aboutRoutes from "./routes/aboutRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import socialRoutes from "./routes/socialRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import technologyRoutes from "./routes/technologyRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/api/about", aboutRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/socials", socialRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/technologies", technologyRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
