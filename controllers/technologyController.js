@@ -11,12 +11,16 @@ export const getTechnologies = async (req, res) => {
 
 export const addTechnology = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ success: false, message: "No image uploaded" });
-    const { name, description } = req.body;
+    const { name, description, icon } = req.body;
+    let iconPath = icon || '';
+    if (req.file && req.file.path) {
+      iconPath = req.file.path;
+    }
+    if (!name) return res.status(400).json({ success: false, message: "Technology name is required" });
     const technology = await Technology.create({
       name,
       description,
-      icon: req.file.path,
+      icon: iconPath,
     });
     res.json({ success: true, technology });
   } catch (err) {
@@ -26,10 +30,12 @@ export const addTechnology = async (req, res) => {
 
 export const updateTechnology = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, icon } = req.body;
     const update = { name, description };
-    if (req.file) {
+    if (req.file && req.file.path) {
       update.icon = req.file.path;
+    } else if (icon) {
+      update.icon = icon;
     }
     const technology = await Technology.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!technology) return res.status(404).json({ success: false, message: "Technology not found" });

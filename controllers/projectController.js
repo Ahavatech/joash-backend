@@ -11,16 +11,21 @@ export const getProjects = async (req, res) => {
 
 export const addProject = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ success: false, message: "No image uploaded" });
-    const { title, description, technologies, liveLink, githubLink } = req.body;
-    const project = await Project.create({
+    const { title, description, technologies, liveLink, githubLink, featured } = req.body;
+    let imageUrl = "";
+    if (req.file && req.file.path) {
+      imageUrl = req.file.path; // Cloudinary URL from multer
+    }
+    const project = new Project({
       title,
       description,
-      technologies: Array.isArray(technologies) ? technologies : [technologies],
-      image: { url: req.file.path, public_id: req.file.filename || req.file.public_id },
+      technologies: technologies ? technologies.split(",") : [],
       liveLink,
       githubLink,
+      featured: featured === "true",
+      image: imageUrl,
     });
+    await project.save();
     res.json({ success: true, project });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -29,23 +34,20 @@ export const addProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
   try {
-    const { title, description, technologies, liveLink, githubLink } = req.body;
-    const update = { title, description, technologies, liveLink, githubLink };
-    if (req.file) {
-      update.image = { url: req.file.path, public_id: req.file.filename || req.file.public_id };
+    const { title, description, technologies, liveLink, githubLink, featured } = req.body;
+    let updateData = {
+      title,
+      description,
+      technologies: technologies ? technologies.split(",") : [],
+      liveLink,
+      githubLink,
+      featured: featured === "true",
+    };
+    if (req.file && req.file.path) {
+      updateData.image = req.file.path;
     }
-    const project = await Project.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+    const project = await Project.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json({ success: true, project });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-export const deleteProject = async (req, res) => {
-  try {
-    await Project.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: "Project deleted" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

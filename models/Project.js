@@ -4,12 +4,10 @@ const ProjectSchema = new mongoose.Schema({
   title: String,
   description: String,
   technologies: [String],
-  image: {
-    url: String,
-    public_id: String,
-  },
   liveLink: String,
   githubLink: String,
+  featured: Boolean,
+  image: String, // Cloudinary URL
 });
 
 export default mongoose.model("Project", ProjectSchema);
