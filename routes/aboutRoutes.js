@@ -1,5 +1,5 @@
 import express from "express";
-import { getAbout, updateAbout, addTechnology, deleteTechnology } from "../controllers/aboutController.js";
+import { getAbout, updateAbout } from "../controllers/aboutController.js";
 import { upload } from "../config/cloudinary.js";
 const router = express.Router();
 
