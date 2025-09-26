@@ -20,7 +20,12 @@ const app = express();
 // Security
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://joashadeoye.onrender.com",
+    "https://joash-frontend.onrender.com",
+  ],
+  credentials: true, // optional, if you're using cookies/auth headers
 }));
 
 // Body parser
