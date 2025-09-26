@@ -5,7 +5,5 @@ const router = express.Router();
 
 router.get("/", getAbout);
 router.put("/", updateAbout);
-router.post("/tech", upload.single("logo"), addTechnology);
-router.delete("/tech/:id", deleteTechnology);
 
 export default router;
