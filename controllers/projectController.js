@@ -52,3 +52,21 @@ export const updateProject = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+export const deleteProject = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+
+    // If image stored via Cloudinary and you stored a public_id, you can remove it here.
+    // For now, just delete the DB record.
+    await Project.findByIdAndDelete(id);
+
+    res.json({ success: true, message: 'Project deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
