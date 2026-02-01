@@ -12,18 +12,36 @@ export const getContacts = async (req, res) => {
 
 export const addContact = async (req, res) => {
   const { name, email, message } = req.body;
+  // Basic validation
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, message: "Please provide name, email and message" });
+  }
+
   try {
-    const contact = await Contact.create({ name, email, message });
-    // Send email
-    await transporter.sendMail({
+    // Send email first so we only save successful submissions (but we'll still attempt to save on email failure)
+    const mailOptions = {
       from: process.env.GMAIL_USER,
       to: process.env.GMAIL_USER,
       subject: `New Contact Message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-    });
+      replyTo: email,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    const contact = await Contact.create({ name, email, message });
     res.json({ success: true, message: "Message sent and saved" });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    // If sending email failed, try to still save the contact so you don't lose messages
+    try {
+      await Contact.create({ name, email, message });
+      console.error("Email send failed, but message saved:", err);
+      return res.status(202).json({ success: true, message: "Message saved but email failed to send", error: err.message });
+    } catch (saveErr) {
+      console.error("Email send failed:", err);
+      console.error("Also failed to save contact:", saveErr);
+      return res.status(500).json({ success: false, message: "Failed to send message and save contact" });
+    }
   }
 };
 
